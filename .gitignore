@@ -1,5 +1,7 @@
+.idea
 build.properties
 local.properties
 bin
 gen
 obj
+build
