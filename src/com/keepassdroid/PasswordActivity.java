@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -131,13 +132,13 @@ public class PasswordActivity extends LockingActivity {
 				if (data != null) {
 					Uri uri = data.getData();
 					if (uri != null) {
-						String path = uri.getPath();
-						if (path != null) {
-							EditText fn = (EditText) findViewById(R.id.pass_keyfile);
-							fn.setText(path);
-							
-						}
-					}
+                        String path = uri.toString();
+
+                        if (path != null) {
+                            EditText fn = (EditText) findViewById(R.id.pass_keyfile);
+                            fn.setText(path);
+                        }
+                    }
 				}
 			}
 			break;
@@ -406,7 +407,13 @@ public class PasswordActivity extends LockingActivity {
 				
 				public void onClick(View v) {
 					Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-					i.setType("file/*");
+
+                    if (Build.VERSION.SDK_INT < 19) {
+                        i.setType("file/*");
+                    } else {
+                        i.setType("*/*");
+                        i.addCategory(Intent.CATEGORY_OPENABLE);
+                    }
 					
 					try {
 						startActivityForResult(i, GET_CONTENT);
