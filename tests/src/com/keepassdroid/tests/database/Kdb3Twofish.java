@@ -38,7 +38,7 @@ public class Kdb3Twofish extends AndroidTestCase {
 		
 		ImporterV3 importer = new ImporterV3();
 
-		PwDatabaseV3 db = importer.openDatabase(is, "12345", "");
+		PwDatabaseV3 db = importer.openDatabase(is, "12345", null);
 		
 		assertTrue(db.algorithm == PwEncryptionAlgorithm.Twofish);
 		

@@ -19,6 +19,8 @@
  */
 package com.keepassdroid.tests.database;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.Context;
@@ -53,7 +55,17 @@ public class TestData {
 		InputStream is = am.open(asset, AssetManager.ACCESS_STREAMING);
 
 		Database Db = new Database();
-		Db.LoadData(ctx, is, password, keyfile, Importer.DEBUG);
+        FileInputStream keyfileStream = keyfile != null && !keyfile.isEmpty()
+                ? new FileInputStream(keyfile) : null;
+        try {
+            Db.LoadData(ctx, is, password, keyfileStream, Importer.DEBUG);
+        } finally {
+            if (keyfileStream != null) {
+                try {
+                    keyfileStream.close();
+                } catch (IOException ignore) {}
+            }
+        }
 		Db.mFilename = filename;
 		
 		return Db;

@@ -30,10 +30,10 @@ public abstract class Importer {
 
 	public static final boolean DEBUG = true;
 
-	public abstract PwDatabase openDatabase( InputStream inStream, String password, String keyfile ) 
+	public abstract PwDatabase openDatabase( InputStream inStream, String password, InputStream keyfileStream)
 		throws IOException, InvalidDBException;
 
-	public abstract PwDatabase openDatabase( InputStream inStream, String password, String keyfile, UpdateStatus status ) 
+	public abstract PwDatabase openDatabase( InputStream inStream, String password, InputStream keyfileStream, UpdateStatus status )
 		throws IOException, InvalidDBException;
 
 

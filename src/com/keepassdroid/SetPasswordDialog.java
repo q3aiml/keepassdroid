@@ -92,7 +92,7 @@ public class SetPasswordDialog extends CancelDialog {
 					
 				}
 				
-				SetPassword sp = new SetPassword(App.getDB(), pass, keyfile, new AfterSave(mFinish, new Handler()));
+				SetPassword sp = new SetPassword(App.getDB(), getContext(), pass, keyfile, new AfterSave(mFinish, new Handler()));
 				ProgressTask pt = new ProgressTask(getContext(), sp, R.string.saving_database);
 				pt.run();
 			}

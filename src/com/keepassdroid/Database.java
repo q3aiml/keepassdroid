@@ -31,11 +31,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import android.content.Context;
+import android.net.Uri;
 
 import com.keepassdroid.database.PwDatabase;
 import com.keepassdroid.database.PwDatabaseV3;
 import com.keepassdroid.database.PwGroup;
 import com.keepassdroid.database.exception.InvalidDBException;
+import com.keepassdroid.database.exception.InvalidKeyFileException;
 import com.keepassdroid.database.exception.PwDbOutputException;
 import com.keepassdroid.database.load.Importer;
 import com.keepassdroid.database.load.ImporterFactory;
@@ -65,7 +67,7 @@ public class Database {
 		loaded = true;
 	}
 	
-	public void LoadData(Context ctx, InputStream is, String password, String keyfile) throws IOException, InvalidDBException {
+	public void LoadData(Context ctx, InputStream is, String password, InputStream keyfile) throws IOException, InvalidDBException {
 		LoadData(ctx, is, password, keyfile, new UpdateStatus(), !Importer.DEBUG);
 	}
 
@@ -78,20 +80,40 @@ public class Database {
 	}
 	
 	public void LoadData(Context ctx, String filename, String password, String keyfile, UpdateStatus status, boolean debug) throws IOException, FileNotFoundException, InvalidDBException {
-		File file = new File(filename);
-		FileInputStream fis = new FileInputStream(file);
-		
-		LoadData(ctx, fis, password, keyfile, status, debug);
-	
-		readOnly = !file.canWrite();
-		mFilename = filename;
-	}
+        File file = new File(filename);
+        FileInputStream fis = new FileInputStream(file);
+        InputStream keyStream = null;
+        try {
+            try {
+                Uri keyfileUri = Uri.parse(keyfile);
+                if (keyfileUri.isRelative()) {
+                    // maintain compatibility with paths
+                    keyfileUri = Uri.parse("file://" + keyfile);
+                }
+                keyStream = ctx.getContentResolver().openInputStream(keyfileUri);
+            } catch (FileNotFoundException e) {
+                throw new InvalidKeyFileException();
+            }
 
-	public void LoadData(Context ctx, InputStream is, String password, String keyfile, boolean debug) throws IOException, InvalidDBException {
+            LoadData(ctx, fis, password, keyStream, status, debug);
+        } finally {
+            try {
+                fis.close();
+            } catch (IOException ignore) {}
+            try {
+                if (keyStream != null) keyStream.close();
+            } catch (IOException ignore) {}
+        }
+
+        readOnly = !file.canWrite();
+        mFilename = filename;
+    }
+
+	public void LoadData(Context ctx, InputStream is, String password, InputStream keyfile, boolean debug) throws IOException, InvalidDBException {
 		LoadData(ctx, is, password, keyfile, new UpdateStatus(), debug);
 	}
 
-	public void LoadData(Context ctx, InputStream is, String password, String keyfile, UpdateStatus status, boolean debug) throws IOException, InvalidDBException {
+	public void LoadData(Context ctx, InputStream is, String password, InputStream keyfile, UpdateStatus status, boolean debug) throws IOException, InvalidDBException {
 
 		BufferedInputStream bis = new BufferedInputStream(is);
 		

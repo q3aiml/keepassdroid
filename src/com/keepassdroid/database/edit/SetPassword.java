@@ -19,7 +19,11 @@
  */
 package com.keepassdroid.database.edit;
 
+import android.content.Context;
+import android.net.Uri;
+
 import java.io.IOException;
+import java.io.InputStream;
 
 
 import com.keepassdroid.Database;
@@ -31,23 +35,26 @@ public class SetPassword extends RunnableOnFinish {
 	private String mPassword;
 	private String mKeyfile;
 	private Database mDb;
+    private Context mCtx;
 	private boolean mDontSave;
 	
-	public SetPassword(Database db, String password, String keyfile, OnFinish finish) {
+	public SetPassword(Database db, Context mCtx, String password, String keyfile, OnFinish finish) {
 		super(finish);
 		
 		mDb = db;
+        this.mCtx = mCtx;
 		mPassword = password;
 		mKeyfile = keyfile;
 		mDontSave = false;
 	}
 
-	public SetPassword(Database db, String password, String keyfile, OnFinish finish, boolean dontSave) {
+	public SetPassword(Database db, Context mCtx, String password, String keyfile, OnFinish finish, boolean dontSave) {
 		super(finish);
 		
 		mDb = db;
 		mPassword = password;
 		mKeyfile = keyfile;
+        this.mCtx = mCtx;
 		mDontSave = dontSave;
 	}
 
@@ -60,7 +67,8 @@ public class SetPassword extends RunnableOnFinish {
 
 		// Set key
 		try {
-			pm.setMasterKey(mPassword, mKeyfile);
+            InputStream keyStream = mCtx.getContentResolver().openInputStream(Uri.parse(mKeyfile));
+			pm.setMasterKey(mPassword, keyStream);
 		} catch (InvalidKeyFileException e) {
 			erase(backupKey);
 			finish(false, e.getMessage());

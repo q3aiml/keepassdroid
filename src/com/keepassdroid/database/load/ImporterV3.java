@@ -123,13 +123,13 @@ public class ImporterV3 extends Importer {
 	 * @throws InvalidAlgorithmParameterException if error decrypting main file body. 
 	 * @throws ShortBufferException if error decrypting main file body.
 	 */
-	public PwDatabaseV3 openDatabase( InputStream inStream, String password, String keyfile )
+	public PwDatabaseV3 openDatabase( InputStream inStream, String password, InputStream keyfile )
 	throws IOException, InvalidDBException
 	{
 		return openDatabase(inStream, password, keyfile, new UpdateStatus());
 	}
 
-	public PwDatabaseV3 openDatabase( InputStream inStream, String password, String keyfile, UpdateStatus status )
+	public PwDatabaseV3 openDatabase( InputStream inStream, String password, InputStream keyFileStream, UpdateStatus status )
 	throws IOException, InvalidDBException
 	{
 		PwDatabaseV3        newManager;
@@ -157,7 +157,7 @@ public class ImporterV3 extends Importer {
 
 		status.updateMessage(R.string.creating_db_key);
 		newManager = createDB();
-		newManager.setMasterKey( password, keyfile );
+		newManager.setMasterKey( password, keyFileStream );
 
 		// Select algorithm
 		if( (hdr.flags & PwDbHeaderV3.FLAG_RIJNDAEL) != 0 ) {

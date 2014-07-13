@@ -19,6 +19,8 @@
  */
 package com.keepassdroid.tests.database;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.Context;
@@ -27,6 +29,8 @@ import android.test.AndroidTestCase;
 
 import com.keepassdroid.database.load.ImporterV3;
 import com.keepassdroid.tests.TestUtil;
+
+import static com.keepassdroid.tests.database.DatabaseUtil.openDatabase;
 
 public class Kdb3 extends AndroidTestCase {
 	
@@ -39,8 +43,8 @@ public class Kdb3 extends AndroidTestCase {
 		InputStream is = am.open(dbAsset, AssetManager.ACCESS_STREAMING);
 		
 		ImporterV3 importer = new ImporterV3();
-		importer.openDatabase(is, password, "/sdcard/key");
-		
+        openDatabase(importer, is, password, "/sdcard/key");
+
 		is.close();
 	}
 	

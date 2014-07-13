@@ -20,20 +20,17 @@
 package com.keepassdroid.database;
 
 import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
-import android.os.DropBoxManager.Entry;
 
 import com.keepassdroid.crypto.finalkey.FinalKey;
 import com.keepassdroid.crypto.finalkey.FinalKeyFactory;
@@ -83,20 +80,20 @@ public abstract class PwDatabase {
 	}
 
 
-	public abstract byte[] getMasterKey(String key, String keyFileName) throws InvalidKeyFileException, IOException;
+	public abstract byte[] getMasterKey(String key, InputStream keyFileStream) throws InvalidKeyFileException, IOException;
 	
-	public void setMasterKey(String key, String keyFileName)
+	public void setMasterKey(String key, InputStream keyFileStream)
 			throws InvalidKeyFileException, IOException {
-				assert( key != null && keyFileName != null );
+				assert( key != null && keyFileStream != null );
 			
-				masterKey = getMasterKey(key, keyFileName);
+				masterKey = getMasterKey(key, keyFileStream);
 			}
 
-	protected byte[] getCompositeKey(String key, String keyFileName)
+	protected byte[] getCompositeKey(String key, InputStream keyFileStream)
 			throws InvalidKeyFileException, IOException {
-				assert(key != null && keyFileName != null);
+				assert(key != null && keyFileStream != null);
 				
-				byte[] fileKey = getFileKey(keyFileName);
+				byte[] fileKey = getFileKey(keyFileStream);
 				
 				byte[] passwordKey = getPasswordKey(key);
 				
@@ -112,55 +109,41 @@ public abstract class PwDatabase {
 				return md.digest(fileKey);
 	}
 
-	protected byte[] getFileKey(String fileName)
+	protected byte[] getFileKey(InputStream keyFileStream)
 			throws InvalidKeyFileException, IOException {
-				assert(fileName != null);
-				
-				File keyfile = new File(fileName);
-				
-				if ( ! keyfile.exists() ) {
-					throw new InvalidKeyFileException();
-				}
-				
-				byte[] key = loadXmlKeyFile(fileName);
+				assert(keyFileStream != null);
+
+                BufferedInputStream bis = new BufferedInputStream(keyFileStream, 1024);
+
+                bis.mark(1024);
+                byte[] key = loadXmlKeyFile(bis);
 				if ( key != null ) {
 					return key;
 				}
-								
-				FileInputStream fis;
-				try {
-					fis = new FileInputStream(keyfile);
-				} catch (FileNotFoundException e) {
-					throw new InvalidKeyFileException();
-				}
-				
-				BufferedInputStream bis = new BufferedInputStream(fis, 64);
-				
-				long fileSize = keyfile.length();
-				if ( fileSize == 0 ) {
+                bis.reset();
+
+                byte[] header = new byte[65];
+                int headerBytesRead = bis.read(header, 0, 65);
+
+				if (headerBytesRead <= 0) {
 					throw new KeyFileEmptyException();
-				} else if ( fileSize == 32 ) {
+				} else if (headerBytesRead == 32) {
 					byte[] outputKey = new byte[32];
 					if ( bis.read(outputKey, 0, 32) != 32 ) {
 						throw new IOException("Error reading key.");
 					}
-					
-					return outputKey;
-				} else if ( fileSize == 64 ) {
-					byte[] hex = new byte[64];
-					
-					bis.mark(64);
-					if ( bis.read(hex, 0, 64) != 64 ) {
-						throw new IOException("Error reading key.");
-					}
-			
+
+					return Arrays.copyOf(header, 32);
+				} else if (headerBytesRead == 64) {
 					try {
-						return hexStringToByteArray(new String(hex));
+						return hexStringToByteArray(new String(header, 0, 64));
 					} catch (IndexOutOfBoundsException e) {
 						// Key is not base 64, treat it as binary data
 						bis.reset();
 					}
-				}
+				} else {
+                    bis.reset();
+                }
 			
 				MessageDigest md;
 				try {
@@ -188,7 +171,7 @@ public abstract class PwDatabase {
 				return md.digest();
 			}
 
-	protected abstract byte[] loadXmlKeyFile(String fileName);
+	protected abstract byte[] loadXmlKeyFile(InputStream fileStream);
 
 	public static byte[] hexStringToByteArray(String s) {
 	    int len = s.length();

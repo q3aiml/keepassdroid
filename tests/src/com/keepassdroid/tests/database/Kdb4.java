@@ -21,6 +21,7 @@ package com.keepassdroid.tests.database;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,6 +40,8 @@ import com.keepassdroid.database.save.PwDbOutput;
 import com.keepassdroid.database.save.PwDbV4Output;
 import com.keepassdroid.stream.CopyInputStream;
 import com.keepassdroid.tests.TestUtil;
+
+import static com.keepassdroid.tests.database.DatabaseUtil.openDatabase;
 
 public class Kdb4 extends AndroidTestCase {
 
@@ -62,7 +65,7 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream is = am.open("test.kdbx", AssetManager.ACCESS_STREAMING);
 		
 		ImporterV4 importer = new ImporterV4();
-		importer.openDatabase(is, "12345", "");
+		importer.openDatabase(is, "12345", null);
 		
 		is.close();
 		
@@ -76,7 +79,7 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream is = am.open("test.kdbx", AssetManager.ACCESS_STREAMING);
 		
 		ImporterV4 importer = new ImporterV4();
-		PwDatabaseV4 db = importer.openDatabase(is, "12345", "");
+		PwDatabaseV4 db = importer.openDatabase(is, "12345", null);
 		is.close();
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -91,7 +94,7 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream bis = new ByteArrayInputStream(data);
 		bis = new CopyInputStream(bis, fos);
 		importer = new ImporterV4();
-		db = importer.openDatabase(bis, "12345", "");
+		db = importer.openDatabase(bis, "12345", null);
 		bis.close();
 		
 		fos.close();
@@ -112,8 +115,8 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream is = am.open("keyfile.kdbx", AssetManager.ACCESS_STREAMING);
 		
 		ImporterV4 importer = new ImporterV4();
-		importer.openDatabase(is, "12345", "/sdcard/key");
-		
+        openDatabase(importer, is, "12345", "/sdcard/key");
+
 		is.close();
 		
 	}
@@ -125,8 +128,8 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream is = am.open("key-only.kdbx", AssetManager.ACCESS_STREAMING);
 		
 		ImporterV4 importer = new ImporterV4();
-		importer.openDatabase(is, "", "/sdcard/key");
-		
+        openDatabase(importer, is, "", "/sdcard/key");
+
 		is.close();
 		
 		
@@ -139,7 +142,7 @@ public class Kdb4 extends AndroidTestCase {
 		InputStream is = am.open("no-encrypt.kdbx", AssetManager.ACCESS_STREAMING);
 		
 		ImporterV4 importer = new ImporterV4();
-		importer.openDatabase(is, "12345", "");
+		importer.openDatabase(is, "12345", null);
 		
 		is.close();
 		
