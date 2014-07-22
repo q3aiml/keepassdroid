@@ -94,16 +94,7 @@ public class DeleteEntry extends RunnableOnFinish {
 		public void run() {
 			PwDatabase pm = mDb.pm;
 			if ( mSuccess ) {
-				// Mark parent dirty
-				if ( mParent != null ) {
-					mDb.dirty.add(mParent);
-				}
-				
-				if (recycled) {
-					PwGroup recycleBin = pm.getRecycleBin();
-					mDb.dirty.add(recycleBin);
-					mDb.dirty.add(mDb.pm.rootGroup);
-				}
+                mDb.modCount++;
 			} else {
 				if (recycled) {
 					pm.undoRecycle(mEntry, mParent);

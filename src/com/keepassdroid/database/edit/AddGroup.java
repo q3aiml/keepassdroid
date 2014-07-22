@@ -76,8 +76,7 @@ public class AddGroup extends RunnableOnFinish {
 		public void run() {
 			PwDatabase pm = mDb.pm;
 			if ( mSuccess ) {
-				// Mark parent group dirty
-				mDb.dirty.add(mParent);
+                mDb.modCount++;
 			} else {
 				pm.removeGroupFrom(mGroup, mParent);
 			}

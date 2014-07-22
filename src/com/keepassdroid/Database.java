@@ -49,7 +49,7 @@ import com.keepassdroid.search.SearchDbHelper;
  * @author bpellin
  */
 public class Database {
-	public Set<PwGroup> dirty = new HashSet<PwGroup>();
+    public long modCount = 0;
 	public PwDatabase pm;
 	public String mFilename;
 	public SearchDbHelper searchHelper;
@@ -183,7 +183,6 @@ public class Database {
 	}
 	
 	public void clear() {
-		dirty.clear();
 		drawFactory.clear();
 		
 		pm = null;
@@ -192,15 +191,7 @@ public class Database {
 	}
 	
 	public void markAllGroupsAsDirty() {
-		for ( PwGroup group : pm.getGroups() ) {
-			dirty.add(group);
-		}
-		
-		// TODO: This should probably be abstracted out
-		// The root group in v3 is not an 'official' group
-		if ( pm instanceof PwDatabaseV3 ) {
-			dirty.add(pm.rootGroup);		
-		}
+        modCount++;
 	}
 	
 	

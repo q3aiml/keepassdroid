@@ -73,9 +73,7 @@ public class UpdateEntry extends RunnableOnFinish {
 						// Resort entries
 						parent.sortEntriesByName();
 
-						// Mark parent group dirty
-						mDb.dirty.add(parent);
-						
+                        mDb.modCount++;
 					}
 				}
 			} else {

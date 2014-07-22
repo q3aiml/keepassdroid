@@ -60,12 +60,7 @@ public class AddEntry extends RunnableOnFinish {
 		public void run() {
 			PwDatabase pm = mDb.pm;
 			if ( mSuccess ) {
-				
-				PwGroup parent = mEntry.getParent();
-
-				// Mark parent group dirty
-				mDb.dirty.add(parent);
-				
+				mDb.modCount++;
 			} else {
 				pm.removeEntryFrom(mEntry, mEntry.getParent());
 			}

@@ -56,6 +56,7 @@ public abstract class GroupBaseActivity extends LockCloseListActivity {
 	private SharedPreferences prefs;
 	
 	protected PwGroup mGroup;
+    protected long lastModCount;
 
 	@Override
 	protected void onResume() {
@@ -66,11 +67,10 @@ public abstract class GroupBaseActivity extends LockCloseListActivity {
 	
 	public void refreshIfDirty() {
 		Database db = App.getDB();
-		if ( db.dirty.contains(mGroup) ) {
-			db.dirty.remove(mGroup);
+		if (lastModCount != db.modCount) {
+            lastModCount = db.modCount;
 			BaseAdapter adapter = (BaseAdapter) getListAdapter();
 			adapter.notifyDataSetChanged();
-			
 		}
 	}
 
@@ -225,13 +225,10 @@ public abstract class GroupBaseActivity extends LockCloseListActivity {
 		// Mark all groups as dirty now to refresh them on load
 		Database db = App.getDB();
 		db.markAllGroupsAsDirty();
-		// We'll manually refresh this group so we can remove it
-		db.dirty.remove(mGroup);
-		
+
 		// Tell the adapter to refresh it's list
 		BaseAdapter adapter = (BaseAdapter) getListAdapter();
 		adapter.notifyDataSetChanged();
-		
 	}
 
 	private void setPassword() {
