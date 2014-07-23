@@ -121,7 +121,7 @@ public abstract class GroupActivity extends GroupBaseActivity {
 		if ( id == null ) {
 			mGroup = root;
 		} else {
-			mGroup = db.pm.groups.get(id);
+			mGroup = db.pm.getGroup(id);
 		}
 		
 		Log.w(TAG, "Retrieved group");

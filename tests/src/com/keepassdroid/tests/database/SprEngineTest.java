@@ -60,7 +60,7 @@ public class SprEngineTest extends AndroidTestCase {
 	public void testRefReplace() {
 		UUID entryUUID = decodeUUID(ENCODE_UUID);
 		
-		PwEntryV4 entry = (PwEntryV4) db.entries.get(entryUUID);
+		PwEntryV4 entry = (PwEntryV4) db.getEntry(entryUUID);
 
 		
 		assertEquals(RESULT, spr.compile(REF, entry, db));

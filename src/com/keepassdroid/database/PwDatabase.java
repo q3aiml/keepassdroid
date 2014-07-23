@@ -45,8 +45,8 @@ public abstract class PwDatabase {
 	public String name = "KeePass database";
 	public PwGroup rootGroup;
 	public PwIconFactory iconFactory = new PwIconFactory();
-	public Map<PwGroupId, PwGroup> groups = new HashMap<PwGroupId, PwGroup>();
-	public Map<UUID, PwEntry> entries = new HashMap<UUID, PwEntry>();
+	protected Map<PwGroupId, PwGroup> groups = new HashMap<PwGroupId, PwGroup>();
+	protected Map<UUID, PwEntry> entries = new HashMap<UUID, PwEntry>();
 	
 	
 	public void makeFinalKey(byte[] masterSeed, byte[] masterSeed2, int numRounds) throws IOException {
@@ -214,7 +214,15 @@ public abstract class PwDatabase {
 	
 	public abstract List<PwGroup> getGroups();
 
+    public PwGroup getGroup(PwGroupId id) {
+        return groups.get(id);
+    }
+
 	public abstract List<PwEntry> getEntries();
+
+    public PwEntry getEntry(UUID uuid) {
+        return entries.get(uuid);
+    }
 	
 	public abstract long getNumRounds();
 	
@@ -321,6 +329,10 @@ public abstract class PwDatabase {
 	public void undoRecycle(PwEntry entry, PwGroup origParent) {
 		throw new RuntimeException("Call not valid for .kdb databases.");
 	}
+
+    public void deleteGroup(PwGroup group) {
+        groups.remove(group.getId());
+    }
 	
 	public void deleteEntry(PwEntry entry) {
 		PwGroup parent = entry.getParent();

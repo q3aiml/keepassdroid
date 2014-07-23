@@ -103,7 +103,7 @@ public class DeleteGroup extends RunnableOnFinish {
 		public void run() {
 			if ( mSuccess ) {
 				// Remove from group global
-				mDb.pm.groups.remove(mGroup.getId());
+				mDb.pm.deleteGroup(mGroup);
 
                 mDb.modCount++;
 			} else {

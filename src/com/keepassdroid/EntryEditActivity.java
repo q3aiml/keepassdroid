@@ -132,7 +132,7 @@ public abstract class EntryEditActivity extends LockCloseActivity {
 		if ( uuidBytes == null ) {
 
 			PwGroupId parentId = getParentGroupId(i, KEY_PARENT);
-			PwGroup parent = pm.groups.get(parentId);
+			PwGroup parent = pm.getGroup(parentId);
 			mEntry = PwEntry.getInstance(parent);
 			mIsNew = true;
 			
@@ -140,7 +140,7 @@ public abstract class EntryEditActivity extends LockCloseActivity {
 			UUID uuid = Types.bytestoUUID(uuidBytes);
 			assert(uuid != null);
 
-			mEntry = pm.entries.get(uuid);
+			mEntry = pm.getEntry(uuid);
 			mIsNew = false;
 			
 			fillData();
